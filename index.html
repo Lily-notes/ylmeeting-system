@@ -712,9 +712,10 @@
       }
     }
 
-  </style>
 
-
+    /* =========================
+       管理後台登入
+    ========================= */
     .login-screen {
       min-height: 100vh;
       display: flex;
@@ -726,36 +727,36 @@
 
     .login-card {
       width: min(430px, 100%);
-      background: white;
+      background: #fff;
       border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 32px;
-      box-shadow: 0 8px 28px rgba(45,80,75,.10);
+      border-radius: 18px;
+      padding: 34px;
+      box-shadow: 0 10px 30px rgba(45,80,75,.10);
     }
 
     .login-icon {
-      width: 52px;
-      height: 52px;
+      width: 54px;
+      height: 54px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--primary-light);
-      border-radius: 14px;
-      font-size: 25px;
       margin-bottom: 16px;
+      border-radius: 15px;
+      background: var(--primary-light);
+      font-size: 25px;
     }
 
     .login-title {
+      margin-bottom: 6px;
+      color: #203842;
       font-size: 24px;
       font-weight: 800;
-      color: #203842;
-      margin-bottom: 6px;
     }
 
     .login-subtitle {
+      margin-bottom: 24px;
       color: var(--text-light);
       font-size: 14px;
-      margin-bottom: 24px;
     }
 
     .login-label {
@@ -769,30 +770,33 @@
 
     .login-btn {
       width: 100%;
-      margin-top: 2px;
     }
 
     .login-error {
       display: none;
       margin-top: 14px;
       padding: 10px 12px;
+      border: 1px solid #E9BABA;
       border-radius: 9px;
       background: #FFF1F1;
-      border: 1px solid #E9BABA;
       color: var(--danger);
       font-size: 14px;
     }
+
+  </style>
 
 </head>
 
 
 <body>
 
+  <!-- 管理後台登入 -->
   <div id="loginScreen" class="login-screen">
     <div class="login-card">
       <div class="login-icon">🔐</div>
       <div class="login-title">管理後台登入</div>
       <div class="login-subtitle">建立新的會議紀錄、預覽進度、列印表單。</div>
+
       <label class="login-label" for="loginPassword">密碼</label>
       <input
         id="loginPassword"
@@ -801,15 +805,16 @@
         placeholder="請輸入管理後台密碼"
         autocomplete="current-password"
       >
-      <button
-        id="loginBtn"
-        class="btn btn-primary login-btn"
-        onclick="firebaseAdminLogin(document.getElementById('loginPassword').value)"
-      >登入</button>
+
+      <button id="loginBtn" class="btn btn-primary login-btn">
+        登入
+      </button>
+
       <div id="loginError" class="login-error"></div>
     </div>
   </div>
 
+  <!-- 原本管理後台：驗證成功後才顯示 -->
   <div id="adminApp" style="display:none;">
 
 
@@ -1300,79 +1305,103 @@
   </div>
 
 
-    <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
-      import {
-        getAuth,
-        signInWithEmailAndPassword,
-        onAuthStateChanged,
-        signOut
-      } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
+  <!-- Firebase Authentication -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+    import {
+      getAuth,
+      signInWithEmailAndPassword,
+      setPersistence,
+      inMemoryPersistence,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
 
-      const firebaseConfig = {
-        apiKey: "AIzaSyDKMadd7qnwEEJySAZL6La9GaUJ5F3Cios",
-        authDomain: "ylmeeting-system.firebaseapp.com",
-        projectId: "ylmeeting-system",
-        storageBucket: "ylmeeting-system.firebasestorage.app",
-        messagingSenderId: "125159346842",
-        appId: "1:125159346842:web:3f7a8fecc22da3ba3bc523"
-      };
+    const firebaseConfig = {
+      apiKey: "AIzaSyDKMadd7qnwEEJySAZL6La9GaUJ5F3Cios",
+      authDomain: "ylmeeting-system.firebaseapp.com",
+      projectId: "ylmeeting-system",
+      storageBucket: "ylmeeting-system.firebasestorage.app",
+      messagingSenderId: "125159346842",
+      appId: "1:125159346842:web:3f7a8fecc22da3ba3bc523"
+    };
 
-      const firebaseApp = initializeApp(firebaseConfig);
-      const auth = getAuth(firebaseApp);
-      const ADMIN_EMAIL = "y3106_lily@yungloong.com.tw";
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
 
-      window.firebaseAdminLogin = async function(password) {
-        if (!password) {
-          alert("請輸入管理後台密碼");
-          return;
+    // Firebase 帳號識別用；登入畫面不顯示 Email。
+    const ADMIN_EMAIL = "y3106_lily@yungloong.com.tw";
+
+    const loginScreen = document.getElementById("loginScreen");
+    const adminApp = document.getElementById("adminApp");
+    const passwordInput = document.getElementById("loginPassword");
+    const loginBtn = document.getElementById("loginBtn");
+    const loginError = document.getElementById("loginError");
+
+    // 使用記憶體登入狀態：關閉分頁/重新開啟後不保留登入。
+    await setPersistence(auth, inMemoryPersistence);
+
+    // 網站每次載入先登出，確保一定從管理登入畫面開始。
+    await signOut(auth).catch(() => {});
+
+    loginScreen.style.display = "flex";
+    adminApp.style.display = "none";
+
+    async function loginAdmin() {
+      const password = passwordInput.value;
+
+      if (!password) {
+        loginError.textContent = "請輸入管理後台密碼。";
+        loginError.style.display = "block";
+        passwordInput.focus();
+        return;
+      }
+
+      loginBtn.disabled = true;
+      loginBtn.textContent = "登入中…";
+      loginError.style.display = "none";
+
+      try {
+        const credential = await signInWithEmailAndPassword(
+          auth,
+          ADMIN_EMAIL,
+          password
+        );
+
+        if (credential.user.email !== ADMIN_EMAIL) {
+          await signOut(auth);
+          throw new Error("非管理員帳號");
         }
 
-        const btn = document.getElementById("loginBtn");
-        const error = document.getElementById("loginError");
+        passwordInput.value = "";
+        loginScreen.style.display = "none";
+        adminApp.style.display = "block";
 
-        btn.disabled = true;
-        btn.textContent = "登入中…";
-        error.style.display = "none";
+      } catch (error) {
+        console.error(error);
 
-        try {
-          await signInWithEmailAndPassword(auth, ADMIN_EMAIL, password);
-        } catch (err) {
-          console.error(err);
-          let msg = "登入失敗，請確認密碼是否正確。";
-          if (
-            err.code === "auth/invalid-credential" ||
-            err.code === "auth/wrong-password" ||
-            err.code === "auth/user-not-found"
-          ) {
-            msg = "密碼錯誤，請重新輸入。";
-          } else if (err.code === "auth/too-many-requests") {
-            msg = "登入嘗試過多，請稍後再試。";
-          }
-          error.textContent = msg;
-          error.style.display = "block";
-          btn.disabled = false;
-          btn.textContent = "登入";
-        }
-      };
-
-      window.firebaseAdminLogout = async function() {
-        await signOut(auth);
-      };
-
-      onAuthStateChanged(auth, (user) => {
-        const loginScreen = document.getElementById("loginScreen");
-        const adminApp = document.getElementById("adminApp");
-
-        if (user && user.email === ADMIN_EMAIL) {
-          loginScreen.style.display = "none";
-          adminApp.style.display = "block";
+        if (error.code === "auth/too-many-requests") {
+          loginError.textContent = "登入嘗試次數過多，請稍後再試。";
         } else {
-          loginScreen.style.display = "flex";
-          adminApp.style.display = "none";
+          loginError.textContent = "密碼錯誤，請重新輸入。";
         }
-      });
-    </script>
+
+        loginError.style.display = "block";
+        passwordInput.select();
+
+      } finally {
+        loginBtn.disabled = false;
+        loginBtn.textContent = "登入";
+      }
+    }
+
+    loginBtn.addEventListener("click", loginAdmin);
+
+    passwordInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        loginAdmin();
+      }
+    });
+  </script>
 
 </body>
 </html>
