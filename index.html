@@ -3,395 +3,965 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>會議紀錄管理系統</title>
 
   <style>
+
+    :root {
+      --primary: #3F8F83;
+      --primary-dark: #32776D;
+      --primary-light: #E8F5F2;
+
+      --bg: #F3F9F8;
+      --card: #FFFFFF;
+
+      --text: #263D4A;
+      --text-light: #71818A;
+
+      --border: #D8E5E2;
+
+      --gold-bg: #FFF8E8;
+      --gold-text: #94733A;
+
+      --success-bg: #E5F5EC;
+      --success-text: #3C8060;
+
+      --blue-bg: #EAF3FA;
+      --blue-text: #44759A;
+
+      --danger: #D85C5C;
+    }
+
+
     * {
       box-sizing: border-box;
     }
 
+
     body {
       margin: 0;
+
       font-family:
         "Noto Sans TC",
         "Microsoft JhengHei",
         Arial,
         sans-serif;
-      background: #f5f3ee;
-      color: #243447;
+
+      background: var(--bg);
+      color: var(--text);
+
+      line-height: 1.6;
     }
 
-    /* ===== 頁首 ===== */
+
+    /* =========================
+       頁首
+    ========================= */
+
     .header {
-      background: #1d2d44;
-      color: white;
-      padding: 24px 6%;
-      box-shadow: 0 2px 8px rgba(0,0,0,.08);
+      background:
+        linear-gradient(
+          135deg,
+          #EAF7F4 0%,
+          #F7FBFA 55%,
+          #E5F3F0 100%
+        );
+
+      border-bottom: 1px solid #D6E8E4;
+
+      padding: 20px 6%;
+
+      position: relative;
+      overflow: hidden;
     }
+
+
+    .header::after {
+      content: "";
+
+      position: absolute;
+
+      width: 420px;
+      height: 140px;
+
+      right: -80px;
+      top: -30px;
+
+      background: rgba(63,143,131,.08);
+
+      border-radius: 50%;
+    }
+
 
     .header-inner {
       max-width: 1180px;
+
       margin: auto;
+
       display: flex;
+
       justify-content: space-between;
+
       align-items: center;
+
+      position: relative;
+
+      z-index: 2;
     }
 
-    .brand-small {
-      font-size: 14px;
-      opacity: .8;
-      margin-bottom: 6px;
+
+    .brand-area {
+      display: flex;
+
+      align-items: center;
+
+      gap: 16px;
     }
+
+
+    .brand-icon {
+      width: 48px;
+      height: 48px;
+
+      border-radius: 14px;
+
+      background: var(--primary);
+
+      color: white;
+
+      display: flex;
+
+      align-items: center;
+      justify-content: center;
+
+      font-size: 24px;
+
+      box-shadow:
+        0 5px 14px rgba(63,143,131,.18);
+    }
+
+
+    .brand-company {
+      font-size: 14px;
+
+      color: #5C7775;
+
+      margin-bottom: 2px;
+
+      font-weight: 600;
+    }
+
 
     .brand-title {
-      font-size: 28px;
-      font-weight: 700;
+      font-size: 27px;
+
+      font-weight: 800;
+
+      color: #203842;
+
       letter-spacing: 1px;
     }
 
-    .admin-badge {
-      border: 1px solid rgba(255,255,255,.45);
-      padding: 9px 18px;
-      border-radius: 24px;
-      font-size: 14px;
+
+    .brand-slogan {
+      font-size: 12px;
+
+      color: #7C918F;
+
+      margin-top: 2px;
     }
 
-    /* ===== 主內容 ===== */
+
+    .admin-badge {
+      background: var(--primary);
+
+      color: white;
+
+      padding: 10px 20px;
+
+      border-radius: 24px;
+
+      font-size: 14px;
+
+      font-weight: 600;
+
+      box-shadow:
+        0 5px 14px rgba(63,143,131,.18);
+    }
+
+
+    /* =========================
+       主內容
+    ========================= */
+
     .container {
       max-width: 1180px;
-      margin: 35px auto 70px;
+
+      margin: 34px auto 70px;
+
       padding: 0 20px;
     }
 
+
     .section {
-      background: white;
-      border: 1px solid #e2ddd3;
-      border-radius: 14px;
-      padding: 28px 32px;
+      background: var(--card);
+
+      border: 1px solid var(--border);
+
+      border-radius: 16px;
+
+      padding: 30px 32px;
+
       margin-bottom: 24px;
-      box-shadow: 0 3px 12px rgba(45,55,65,.05);
+
+      box-shadow:
+        0 4px 18px rgba(45,80,75,.06);
     }
+
+
+    .section-heading {
+      display: flex;
+
+      align-items: center;
+
+      gap: 14px;
+
+      margin-bottom: 25px;
+    }
+
+
+    .section-icon {
+      width: 48px;
+      height: 48px;
+
+      background: var(--primary-light);
+
+      color: var(--primary);
+
+      border-radius: 14px;
+
+      display: flex;
+
+      align-items: center;
+      justify-content: center;
+
+      font-size: 23px;
+    }
+
 
     .section-title {
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 24px;
-      color: #1d2d44;
+      font-size: 21px;
+
+      font-weight: 800;
+
+      color: #203842;
+
+      margin: 0;
     }
 
-    /* ===== 表單 ===== */
+
+    .section-subtitle {
+      font-size: 13px;
+
+      color: var(--text-light);
+
+      margin-top: 2px;
+    }
+
+
+    /* =========================
+       表單
+    ========================= */
+
     .form-grid {
       display: grid;
+
       grid-template-columns: 1fr 1fr;
+
       gap: 20px;
     }
 
+
     .form-group {
       display: flex;
+
       flex-direction: column;
     }
+
 
     .form-group.full {
       grid-column: 1 / -1;
     }
 
+
     label {
       font-size: 14px;
-      font-weight: 600;
+
+      font-weight: 700;
+
       margin-bottom: 8px;
-      color: #4b5b6b;
+
+      color: #405763;
     }
 
+
+    label::after {
+      content: "";
+    }
+
+
     input,
-    textarea {
+    textarea,
+    select {
       width: 100%;
-      border: 1px solid #d8d1c5;
-      border-radius: 9px;
-      padding: 12px 14px;
+
+      border: 1px solid #D5E2DF;
+
+      border-radius: 10px;
+
+      padding: 13px 14px;
+
       font-size: 15px;
+
       font-family: inherit;
-      color: #263746;
-      background: #fff;
+
+      color: var(--text);
+
+      background: white;
+
       outline: none;
+
       transition: .2s;
     }
 
-    input:focus,
-    textarea:focus {
-      border-color: #a8833d;
-      box-shadow: 0 0 0 3px rgba(168,131,61,.10);
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #A4B0B5;
     }
 
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+
+      border-color: var(--primary);
+
+      box-shadow:
+        0 0 0 3px rgba(63,143,131,.10);
+    }
+
+
     textarea {
-      min-height: 300px;
-      line-height: 1.8;
+      min-height: 320px;
+
+      line-height: 1.85;
+
       resize: vertical;
     }
 
-    /* ===== 按鈕 ===== */
+
+    /* =========================
+       按鈕
+    ========================= */
+
     .form-actions {
+
       margin-top: 22px;
+
       display: flex;
+
+      align-items: center;
+
       gap: 12px;
     }
+
 
     .btn {
+
       border: none;
-      border-radius: 8px;
+
+      border-radius: 9px;
+
       padding: 12px 22px;
+
       font-size: 15px;
-      font-weight: 600;
+
+      font-weight: 700;
+
       cursor: pointer;
+
       font-family: inherit;
+
+      transition: .2s;
     }
+
 
     .btn-primary {
-      background: #aa823d;
+
+      background: var(--primary);
+
       color: white;
+
+      box-shadow:
+        0 4px 10px rgba(63,143,131,.18);
     }
+
 
     .btn-primary:hover {
-      background: #936d2e;
+
+      background: var(--primary-dark);
+
+      transform: translateY(-1px);
     }
+
 
     .btn-secondary {
+
       background: white;
-      color: #33485c;
-      border: 1px solid #d7d0c4;
+
+      color: #526771;
+
+      border: 1px solid #D5E2DF;
     }
 
-    /* ===== 紀錄列表 ===== */
-    .record-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
+
+    .btn-secondary:hover {
+
+      background: #F6FAF9;
     }
 
-    .record {
-      display: grid;
-      grid-template-columns: 1fr 130px 180px;
-      gap: 20px;
-      align-items: center;
-      padding: 18px 20px;
-      border: 1px solid #e4dfd6;
-      border-radius: 11px;
-      background: #fff;
-    }
 
-    .record-title {
-      font-weight: 700;
-      font-size: 16px;
-      color: #1d2d44;
-      margin-bottom: 6px;
-    }
-
-    .record-info {
-      color: #7a7f84;
-      font-size: 13px;
-    }
-
-    .status {
-      display: inline-block;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: 600;
-      background: #f4ead5;
-      color: #8b682c;
-      text-align: center;
-    }
-
-    .status.done {
-      background: #e4f1e9;
-      color: #397454;
-    }
-
-    .record-actions {
-      display: flex;
-      gap: 7px;
-      justify-content: flex-end;
-    }
-
-    .small-btn {
-      background: white;
-      border: 1px solid #d8d1c5;
-      border-radius: 7px;
-      padding: 7px 10px;
-      cursor: pointer;
-      font-family: inherit;
-      font-size: 13px;
-      color: #33485c;
-    }
-
-    .small-btn:hover {
-      background: #f7f4ef;
-    }
-
-    /* ===== 提示 ===== */
     .notice {
+
       display: none;
-      background: #e8f3eb;
-      color: #397454;
-      border: 1px solid #c9e1d1;
-      padding: 13px 16px;
-      border-radius: 8px;
+
       margin-top: 18px;
+
+      padding: 13px 16px;
+
+      border-radius: 9px;
+
+      background: var(--gold-bg);
+
+      color: var(--gold-text);
+
+      border: 1px solid #F0E1B9;
+
       font-size: 14px;
     }
 
-    /* ===== 手機版 ===== */
-    @media (max-width: 800px) {
+
+    /* =========================
+       所有紀錄
+    ========================= */
+
+    .record-header {
+
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+      gap: 15px;
+
+      margin-bottom: 22px;
+    }
+
+
+    .record-list {
+
+      display: flex;
+
+      flex-direction: column;
+
+      gap: 0;
+    }
+
+
+    .record {
+
+      display: grid;
+
+      grid-template-columns:
+        minmax(260px, 1fr)
+        145px
+        auto;
+
+      gap: 20px;
+
+      align-items: center;
+
+      padding: 18px 12px;
+
+      border-bottom: 1px solid #E4ECEA;
+    }
+
+
+    .record:first-child {
+
+      border-top: 1px solid #E4ECEA;
+    }
+
+
+    .record:hover {
+
+      background: #FAFCFC;
+    }
+
+
+    .record-title {
+
+      font-weight: 800;
+
+      font-size: 16px;
+
+      color: #29434E;
+
+      margin-bottom: 5px;
+    }
+
+
+    .record-info {
+
+      color: var(--text-light);
+
+      font-size: 13px;
+    }
+
+
+    .status {
+
+      display: inline-block;
+
+      padding: 6px 12px;
+
+      border-radius: 20px;
+
+      font-size: 13px;
+
+      font-weight: 700;
+
+      background: var(--gold-bg);
+
+      color: var(--gold-text);
+
+      text-align: center;
+
+      white-space: nowrap;
+    }
+
+
+    .status.done {
+
+      background: var(--success-bg);
+
+      color: var(--success-text);
+    }
+
+
+    .status.processing {
+
+      background: var(--blue-bg);
+
+      color: var(--blue-text);
+    }
+
+
+    .record-actions {
+
+      display: flex;
+
+      gap: 7px;
+
+      justify-content: flex-end;
+
+      flex-wrap: wrap;
+    }
+
+
+    .small-btn {
+
+      background: white;
+
+      border: 1px solid #D5E2DF;
+
+      border-radius: 8px;
+
+      padding: 7px 11px;
+
+      cursor: pointer;
+
+      font-family: inherit;
+
+      font-size: 13px;
+
+      color: #45606B;
+
+      transition: .2s;
+    }
+
+
+    .small-btn:hover {
+
+      background: var(--primary-light);
+
+      border-color: #B9D8D2;
+
+      color: var(--primary-dark);
+    }
+
+
+    .small-btn.delete {
+
+      color: var(--danger);
+
+      border-color: #E9BABA;
+    }
+
+
+    .small-btn.delete:hover {
+
+      background: #FFF4F4;
+    }
+
+
+    /* =========================
+       頁尾
+    ========================= */
+
+    .footer {
+
+      text-align: center;
+
+      color: #80918F;
+
+      font-size: 13px;
+
+      padding: 20px;
+
+      border-top: 1px solid #DCE9E6;
+    }
+
+
+    /* =========================
+       手機版
+    ========================= */
+
+    @media (max-width: 850px) {
 
       .header-inner {
+
         align-items: flex-start;
+
         gap: 15px;
       }
 
+
+      .brand-slogan {
+
+        display: none;
+      }
+
+
       .brand-title {
+
         font-size: 23px;
       }
 
+
       .form-grid {
+
         grid-template-columns: 1fr;
       }
 
+
       .form-group.full {
+
         grid-column: auto;
       }
 
+
       .record {
+
         grid-template-columns: 1fr;
+
         gap: 12px;
       }
 
+
       .record-actions {
+
         justify-content: flex-start;
       }
 
+
+      .record-header {
+
+        align-items: flex-start;
+
+        flex-direction: column;
+      }
+
+
       .section {
-        padding: 22px 18px;
+
+        padding: 24px 18px;
       }
     }
+
   </style>
+
 </head>
+
 
 <body>
 
-  <!-- 頁首 -->
+
+  <!-- =========================
+       頁首
+  ========================= -->
+
   <header class="header">
+
     <div class="header-inner">
 
-      <div>
-        <div class="brand-small">永隆工程・人力資源</div>
-        <div class="brand-title">會議紀錄</div>
+      <div class="brand-area">
+
+        <div class="brand-icon">
+          📝
+        </div>
+
+        <div>
+
+          <div class="brand-company">
+            永隆工程
+          </div>
+
+          <div class="brand-title">
+            會議紀錄
+          </div>
+
+          <div class="brand-slogan">
+            紀錄每一次討論，讓團隊更有效率
+          </div>
+
+        </div>
+
       </div>
+
 
       <div class="admin-badge">
         管理後台
       </div>
 
     </div>
+
   </header>
 
 
+
+  <!-- =========================
+       主內容
+  ========================= -->
+
   <main class="container">
 
+
     <!-- 新增會議 -->
+
     <section class="section">
 
-      <div class="section-title">
-        新增會議紀錄
+
+      <div class="section-heading">
+
+        <div class="section-icon">
+          📝
+        </div>
+
+        <div>
+
+          <h2 class="section-title">
+            新增會議紀錄
+          </h2>
+
+          <div class="section-subtitle">
+            完整記錄・清晰追蹤・高效行動
+          </div>
+
+        </div>
+
       </div>
+
+
 
       <div class="form-grid">
 
+
         <div class="form-group">
-          <label>會議主旨</label>
+
+          <label>
+            會議主旨
+          </label>
+
           <input
             type="text"
             id="meetingTitle"
             placeholder="例如：儀控招募與人員培訓會議"
           >
+
         </div>
 
+
+
         <div class="form-group">
-          <label>會議部門</label>
+
+          <label>
+            會議部門
+          </label>
+
           <input
             type="text"
             id="department"
             placeholder="例如：苗栗廠／儀控"
           >
+
         </div>
 
+
+
         <div class="form-group">
-          <label>會議日期時間</label>
+
+          <label>
+            會議日期時間
+          </label>
+
           <input
             type="datetime-local"
             id="meetingDate"
           >
+
         </div>
 
+
+
         <div class="form-group">
-          <label>主持人</label>
+
+          <label>
+            主持人
+          </label>
+
           <input
             type="text"
             id="host"
             placeholder="請輸入主持人"
           >
+
         </div>
 
+
+
         <div class="form-group full">
-          <label>會議紀錄</label>
+
+          <label>
+            會議紀錄
+          </label>
 
           <textarea
             id="meetingContent"
             placeholder="請輸入本次會議討論內容、決議事項、後續安排……"
           ></textarea>
+
         </div>
+
 
       </div>
 
+
+
       <div class="form-actions">
+
 
         <button
           class="btn btn-primary"
           onclick="createMeeting()"
         >
-          建立並產生連結
+          ➤ 建立並產生連結
         </button>
+
 
         <button
           class="btn btn-secondary"
           onclick="clearForm()"
         >
-          清除
+          ↻ 清除
         </button>
 
+
       </div>
+
+
 
       <div
         class="notice"
         id="successMessage"
       >
-        會議紀錄已建立，下一步將產生專屬確認連結。
+        💡 建立後將產生專屬連結，可提供與會人員查看及確認會議紀錄。
       </div>
+
 
     </section>
 
 
-    <!-- 所有紀錄 -->
+
+    <!-- =========================
+         所有紀錄
+    ========================= -->
+
     <section class="section">
 
-      <div class="section-title">
-        所有紀錄
-      </div>
 
-      <div class="record-list" id="recordList">
+      <div class="record-header">
 
-        <!-- 範例資料 -->
-        <div class="record">
+        <div class="section-heading" style="margin-bottom:0;">
+
+          <div class="section-icon">
+            📄
+          </div>
 
           <div>
+
+            <h2 class="section-title">
+              所有紀錄
+            </h2>
+
+            <div class="section-subtitle">
+              快速找到過去的會議內容
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <div
+        class="record-list"
+        id="recordList"
+      >
+
+
+        <!-- 範例資料 -->
+
+        <div class="record">
+
+
+          <div>
+
             <div class="record-title">
               儀控招募與人員培訓會議
             </div>
@@ -399,15 +969,21 @@
             <div class="record-info">
               苗栗廠／儀控　・　2026/09/21 14:00
             </div>
+
           </div>
 
+
           <div>
+
             <span class="status">
               待與會人員確認
             </span>
+
           </div>
 
+
           <div class="record-actions">
+
 
             <button
               class="small-btn"
@@ -416,12 +992,14 @@
               查看
             </button>
 
+
             <button
               class="small-btn"
               onclick="copyLink()"
             >
               複製連結
             </button>
+
 
             <button
               class="small-btn"
@@ -430,90 +1008,200 @@
               轉出 PDF
             </button>
 
+
+            <button
+              class="small-btn delete"
+              onclick="deleteMeeting()"
+            >
+              刪除
+            </button>
+
+
           </div>
+
 
         </div>
 
+
       </div>
 
+
     </section>
+
 
   </main>
 
 
+
+  <footer class="footer">
+
+    永隆工程股份有限公司　・　會議紀錄系統
+
+  </footer>
+
+
+
   <script>
+
 
     function createMeeting() {
 
       const title =
-        document.getElementById("meetingTitle").value.trim();
+        document
+          .getElementById("meetingTitle")
+          .value
+          .trim();
+
 
       const department =
-        document.getElementById("department").value.trim();
+        document
+          .getElementById("department")
+          .value
+          .trim();
+
 
       const date =
-        document.getElementById("meetingDate").value;
+        document
+          .getElementById("meetingDate")
+          .value;
+
 
       const content =
-        document.getElementById("meetingContent").value.trim();
+        document
+          .getElementById("meetingContent")
+          .value
+          .trim();
+
 
       if (!title) {
+
         alert("請輸入會議主旨");
+
         return;
       }
+
 
       if (!department) {
+
         alert("請輸入會議部門");
+
         return;
       }
+
 
       if (!date) {
+
         alert("請選擇會議日期時間");
+
         return;
       }
+
 
       if (!content) {
+
         alert("請輸入會議紀錄");
+
         return;
       }
 
-      document.getElementById("successMessage").style.display = "block";
+
+      document
+        .getElementById("successMessage")
+        .style.display = "block";
+
 
       alert(
         "第一版畫面測試成功！\n\n" +
-        "下一步會把這裡正式接到 Firebase，" +
-        "讓資料真的儲存並產生專屬網址。"
+        "下一階段會正式接上 Firebase，" +
+        "讓會議資料可以儲存並產生專屬網址。"
       );
+
     }
+
 
 
     function clearForm() {
 
-      document.getElementById("meetingTitle").value = "";
-      document.getElementById("department").value = "";
-      document.getElementById("meetingDate").value = "";
-      document.getElementById("host").value = "";
-      document.getElementById("meetingContent").value = "";
+      document
+        .getElementById("meetingTitle")
+        .value = "";
 
-      document.getElementById("successMessage").style.display = "none";
+
+      document
+        .getElementById("department")
+        .value = "";
+
+
+      document
+        .getElementById("meetingDate")
+        .value = "";
+
+
+      document
+        .getElementById("host")
+        .value = "";
+
+
+      document
+        .getElementById("meetingContent")
+        .value = "";
+
+
+      document
+        .getElementById("successMessage")
+        .style.display = "none";
+
     }
+
 
 
     function previewMeeting() {
-      alert("下一階段會加入會議內容預覽頁。");
+
+      alert(
+        "下一階段會加入正式的會議紀錄查看頁面。"
+      );
+
     }
+
 
 
     function copyLink() {
-      alert("下一階段會產生真正的專屬會議連結。");
+
+      alert(
+        "下一階段會產生真正的專屬會議連結。"
+      );
+
     }
+
 
 
     function exportPDF() {
-      alert("下一階段會加入正式 PDF 輸出功能。");
+
+      alert(
+        "下一階段會加入正式 PDF 輸出功能。"
+      );
+
+    }
+
+
+
+    function deleteMeeting() {
+
+      if (
+        confirm("確定要刪除這筆測試紀錄嗎？")
+      ) {
+
+        alert(
+          "正式接上 Firebase 後，" +
+          "這裡才會真的刪除資料。"
+        );
+
+      }
+
     }
 
   </script>
+
 
 </body>
 </html>
