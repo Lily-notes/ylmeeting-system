@@ -712,38 +712,39 @@
       }
     }
 
-
-    /* =========================
-       管理後台登入
-    ========================= */
+  
+    /* ===== 管理後台登入 ===== */
     .login-screen {
-      min-height: 100vh;
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 30px 20px;
+      padding: 24px;
       background: var(--bg);
     }
 
     .login-card {
       width: min(430px, 100%);
+      box-sizing: border-box;
       background: #fff;
       border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 34px;
-      box-shadow: 0 10px 30px rgba(45,80,75,.10);
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 10px 30px rgba(45, 80, 75, .10);
     }
 
     .login-icon {
-      width: 54px;
-      height: 54px;
+      width: 52px;
+      height: 52px;
       display: flex;
       align-items: center;
       justify-content: center;
       margin-bottom: 16px;
-      border-radius: 15px;
+      border-radius: 14px;
       background: var(--primary-light);
-      font-size: 25px;
+      font-size: 24px;
     }
 
     .login-title {
@@ -757,6 +758,7 @@
       margin-bottom: 24px;
       color: var(--text-light);
       font-size: 14px;
+      line-height: 1.6;
     }
 
     .login-label {
@@ -765,6 +767,8 @@
     }
 
     .login-input {
+      width: 100%;
+      box-sizing: border-box;
       margin-bottom: 14px;
     }
 
@@ -781,16 +785,17 @@
       background: #FFF1F1;
       color: var(--danger);
       font-size: 14px;
+      line-height: 1.5;
     }
 
-  </style>
+</style>
 
 </head>
 
 
 <body>
 
-  <!-- 管理後台登入 -->
+  <!-- 管理後台登入畫面 -->
   <div id="loginScreen" class="login-screen">
     <div class="login-card">
       <div class="login-icon">🔐</div>
@@ -806,7 +811,7 @@
         autocomplete="current-password"
       >
 
-      <button id="loginBtn" class="btn btn-primary login-btn">
+      <button id="loginBtn" type="button" class="btn btn-primary login-btn">
         登入
       </button>
 
@@ -814,8 +819,6 @@
     </div>
   </div>
 
-  <!-- 原本管理後台：驗證成功後才顯示 -->
-  <div id="adminApp" style="display:none;">
 
 
 
@@ -1302,10 +1305,9 @@
   </script>
 
 
-  </div>
 
 
-  <!-- Firebase Authentication -->
+  <!-- Firebase Authentication：管理後台登入 -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
     import {
@@ -1327,32 +1329,24 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-
-    // Firebase 帳號識別用；登入畫面不顯示 Email。
     const ADMIN_EMAIL = "y3106_lily@yungloong.com.tw";
 
     const loginScreen = document.getElementById("loginScreen");
-    const adminApp = document.getElementById("adminApp");
-    const passwordInput = document.getElementById("loginPassword");
+    const loginPassword = document.getElementById("loginPassword");
     const loginBtn = document.getElementById("loginBtn");
     const loginError = document.getElementById("loginError");
 
-    // 使用記憶體登入狀態：關閉分頁/重新開啟後不保留登入。
-    await setPersistence(auth, inMemoryPersistence);
-
-    // 網站每次載入先登出，確保一定從管理登入畫面開始。
-    await signOut(auth).catch(() => {});
-
-    loginScreen.style.display = "flex";
-    adminApp.style.display = "none";
+    function showLoginError(message) {
+      loginError.textContent = message;
+      loginError.style.display = "block";
+    }
 
     async function loginAdmin() {
-      const password = passwordInput.value;
+      const password = loginPassword.value.trim();
 
       if (!password) {
-        loginError.textContent = "請輸入管理後台密碼。";
-        loginError.style.display = "block";
-        passwordInput.focus();
+        showLoginError("請輸入管理後台密碼。");
+        loginPassword.focus();
         return;
       }
 
@@ -1361,33 +1355,22 @@
       loginError.style.display = "none";
 
       try {
-        const credential = await signInWithEmailAndPassword(
-          auth,
-          ADMIN_EMAIL,
-          password
-        );
+        await setPersistence(auth, inMemoryPersistence);
+        await signInWithEmailAndPassword(auth, ADMIN_EMAIL, password);
 
-        if (credential.user.email !== ADMIN_EMAIL) {
-          await signOut(auth);
-          throw new Error("非管理員帳號");
-        }
-
-        passwordInput.value = "";
+        // 登入成功：移除遮罩，顯示原本完整管理後台。
         loginScreen.style.display = "none";
-        adminApp.style.display = "block";
-
       } catch (error) {
-        console.error(error);
+        console.error("管理後台登入失敗：", error);
 
         if (error.code === "auth/too-many-requests") {
-          loginError.textContent = "登入嘗試次數過多，請稍後再試。";
+          showLoginError("登入嘗試過多，請稍後再試。");
         } else {
-          loginError.textContent = "密碼錯誤，請重新輸入。";
+          showLoginError("密碼錯誤，請重新輸入。");
         }
 
-        loginError.style.display = "block";
-        passwordInput.select();
-
+        loginPassword.focus();
+        loginPassword.select();
       } finally {
         loginBtn.disabled = false;
         loginBtn.textContent = "登入";
@@ -1396,11 +1379,17 @@
 
     loginBtn.addEventListener("click", loginAdmin);
 
-    passwordInput.addEventListener("keydown", (event) => {
+    loginPassword.addEventListener("keydown", (event) => {
       if (event.key === "Enter") {
         loginAdmin();
       }
     });
+
+    // 頁面第一次載入時先清掉舊的登入狀態，
+    // 確保開啟網站一定先看到登入畫面。
+    await setPersistence(auth, inMemoryPersistence);
+    await signOut(auth).catch(() => {});
+    loginScreen.style.display = "flex";
   </script>
 
 </body>
