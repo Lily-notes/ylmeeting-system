@@ -174,6 +174,9 @@
 
 
     .admin-badge {
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
       background: var(--primary);
 
       color: white;
@@ -715,6 +718,7 @@
   
     /* ===== 管理後台登入 ===== */
     .login-screen {
+      display: none;
       position: fixed;
       inset: 0;
       z-index: 99999;
@@ -855,9 +859,14 @@
       </div>
 
 
-      <div class="admin-badge">
+      <button
+        type="button"
+        class="admin-badge"
+        id="adminBadge"
+        onclick="openAdminLogin()"
+      >
         管理後台
-      </div>
+      </button>
 
     </div>
 
@@ -1314,7 +1323,8 @@
       getAuth,
       signInWithEmailAndPassword,
       setPersistence,
-      inMemoryPersistence,
+      browserSessionPersistence,
+      onAuthStateChanged,
       signOut
     } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
 
@@ -1329,17 +1339,35 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+
+    // 管理員帳號固定為你的 Firebase 帳號
     const ADMIN_EMAIL = "y3106_lily@yungloong.com.tw";
 
     const loginScreen = document.getElementById("loginScreen");
     const loginPassword = document.getElementById("loginPassword");
     const loginBtn = document.getElementById("loginBtn");
     const loginError = document.getElementById("loginError");
+    const adminBadge = document.getElementById("adminBadge");
 
     function showLoginError(message) {
       loginError.textContent = message;
       loginError.style.display = "block";
     }
+
+    // 點「管理後台」才顯示登入視窗
+    window.openAdminLogin = function () {
+      loginError.style.display = "none";
+      loginPassword.value = "";
+      loginScreen.style.display = "flex";
+      setTimeout(() => loginPassword.focus(), 50);
+    };
+
+    // 關閉登入視窗（點遮罩空白處）
+    loginScreen.addEventListener("click", (event) => {
+      if (event.target === loginScreen) {
+        loginScreen.style.display = "none";
+      }
+    });
 
     async function loginAdmin() {
       const password = loginPassword.value.trim();
@@ -1355,18 +1383,25 @@
       loginError.style.display = "none";
 
       try {
-        await setPersistence(auth, inMemoryPersistence);
+        await setPersistence(auth, browserSessionPersistence);
         await signInWithEmailAndPassword(auth, ADMIN_EMAIL, password);
 
-        // 登入成功：移除遮罩，顯示原本完整管理後台。
+        // 登入成功
         loginScreen.style.display = "none";
+        adminBadge.textContent = "管理後台 ✓";
       } catch (error) {
         console.error("管理後台登入失敗：", error);
 
-        if (error.code === "auth/too-many-requests") {
+        if (error.code === "auth/invalid-credential" ||
+            error.code === "auth/wrong-password" ||
+            error.code === "auth/user-not-found") {
+          showLoginError("密碼錯誤，請確認你輸入的是 Firebase 帳號的密碼。");
+        } else if (error.code === "auth/too-many-requests") {
           showLoginError("登入嘗試過多，請稍後再試。");
+        } else if (error.code === "auth/operation-not-allowed") {
+          showLoginError("Firebase 尚未啟用「電子郵件/密碼」登入方式。");
         } else {
-          showLoginError("密碼錯誤，請重新輸入。");
+          showLoginError("登入失敗：" + (error.message || "請稍後再試。"));
         }
 
         loginPassword.focus();
@@ -1383,13 +1418,27 @@
       if (event.key === "Enter") {
         loginAdmin();
       }
+      if (event.key === "Escape") {
+        loginScreen.style.display = "none";
+      }
     });
 
-    // 頁面第一次載入時先清掉舊的登入狀態，
-    // 確保開啟網站一定先看到登入畫面。
-    await setPersistence(auth, inMemoryPersistence);
-    await signOut(auth).catch(() => {});
-    loginScreen.style.display = "flex";
+    // 載入網站時不再強制跳出登入畫面。
+    // 如果之前在同一個瀏覽器分頁已登入，直接視為已登入。
+    onAuthStateChanged(auth, (user) => {
+      if (user && user.email === ADMIN_EMAIL) {
+        adminBadge.textContent = "管理後台 ✓";
+        loginScreen.style.display = "none";
+      } else {
+        adminBadge.textContent = "管理後台";
+      }
+    });
+
+    // 提供後續真正的登出功能使用
+    window.logoutAdmin = async function () {
+      await signOut(auth);
+      adminBadge.textContent = "管理後台";
+    };
   </script>
 
 </body>
