@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>會議紀錄管理系統</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family:
+        "Noto Sans TC",
+        "Microsoft JhengHei",
+        Arial,
+        sans-serif;
+      background: #f5f3ee;
+      color: #243447;
+    }
+
+    /* ===== 頁首 ===== */
+    .header {
+      background: #1d2d44;
+      color: white;
+      padding: 24px 6%;
+      box-shadow: 0 2px 8px rgba(0,0,0,.08);
+    }
+
+    .header-inner {
+      max-width: 1180px;
+      margin: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand-small {
+      font-size: 14px;
+      opacity: .8;
+      margin-bottom: 6px;
+    }
+
+    .brand-title {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .admin-badge {
+      border: 1px solid rgba(255,255,255,.45);
+      padding: 9px 18px;
+      border-radius: 24px;
+      font-size: 14px;
+    }
+
+    /* ===== 主內容 ===== */
+    .container {
+      max-width: 1180px;
+      margin: 35px auto 70px;
+      padding: 0 20px;
+    }
+
+    .section {
+      background: white;
+      border: 1px solid #e2ddd3;
+      border-radius: 14px;
+      padding: 28px 32px;
+      margin-bottom: 24px;
+      box-shadow: 0 3px 12px rgba(45,55,65,.05);
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 24px;
+      color: #1d2d44;
+    }
+
+    /* ===== 表單 ===== */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #4b5b6b;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      border: 1px solid #d8d1c5;
+      border-radius: 9px;
+      padding: 12px 14px;
+      font-size: 15px;
+      font-family: inherit;
+      color: #263746;
+      background: #fff;
+      outline: none;
+      transition: .2s;
+    }
+
+    input:focus,
+    textarea:focus {
+      border-color: #a8833d;
+      box-shadow: 0 0 0 3px rgba(168,131,61,.10);
+    }
+
+    textarea {
+      min-height: 300px;
+      line-height: 1.8;
+      resize: vertical;
+    }
+
+    /* ===== 按鈕 ===== */
+    .form-actions {
+      margin-top: 22px;
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 8px;
+      padding: 12px 22px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: #aa823d;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #936d2e;
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #33485c;
+      border: 1px solid #d7d0c4;
+    }
+
+    /* ===== 紀錄列表 ===== */
+    .record-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .record {
+      display: grid;
+      grid-template-columns: 1fr 130px 180px;
+      gap: 20px;
+      align-items: center;
+      padding: 18px 20px;
+      border: 1px solid #e4dfd6;
+      border-radius: 11px;
+      background: #fff;
+    }
+
+    .record-title {
+      font-weight: 700;
+      font-size: 16px;
+      color: #1d2d44;
+      margin-bottom: 6px;
+    }
+
+    .record-info {
+      color: #7a7f84;
+      font-size: 13px;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      background: #f4ead5;
+      color: #8b682c;
+      text-align: center;
+    }
+
+    .status.done {
+      background: #e4f1e9;
+      color: #397454;
+    }
+
+    .record-actions {
+      display: flex;
+      gap: 7px;
+      justify-content: flex-end;
+    }
+
+    .small-btn {
+      background: white;
+      border: 1px solid #d8d1c5;
+      border-radius: 7px;
+      padding: 7px 10px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 13px;
+      color: #33485c;
+    }
+
+    .small-btn:hover {
+      background: #f7f4ef;
+    }
+
+    /* ===== 提示 ===== */
+    .notice {
+      display: none;
+      background: #e8f3eb;
+      color: #397454;
+      border: 1px solid #c9e1d1;
+      padding: 13px 16px;
+      border-radius: 8px;
+      margin-top: 18px;
+      font-size: 14px;
+    }
+
+    /* ===== 手機版 ===== */
+    @media (max-width: 800px) {
+
+      .header-inner {
+        align-items: flex-start;
+        gap: 15px;
+      }
+
+      .brand-title {
+        font-size: 23px;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-group.full {
+        grid-column: auto;
+      }
+
+      .record {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .record-actions {
+        justify-content: flex-start;
+      }
+
+      .section {
+        padding: 22px 18px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- 頁首 -->
+  <header class="header">
+    <div class="header-inner">
+
+      <div>
+        <div class="brand-small">永隆工程・人力資源</div>
+        <div class="brand-title">會議紀錄</div>
+      </div>
+
+      <div class="admin-badge">
+        管理後台
+      </div>
+
+    </div>
+  </header>
+
+
+  <main class="container">
+
+    <!-- 新增會議 -->
+    <section class="section">
+
+      <div class="section-title">
+        新增會議紀錄
+      </div>
+
+      <div class="form-grid">
+
+        <div class="form-group">
+          <label>會議主旨</label>
+          <input
+            type="text"
+            id="meetingTitle"
+            placeholder="例如：儀控招募與人員培訓會議"
+          >
+        </div>
+
+        <div class="form-group">
+          <label>會議部門</label>
+          <input
+            type="text"
+            id="department"
+            placeholder="例如：苗栗廠／儀控"
+          >
+        </div>
+
+        <div class="form-group">
+          <label>會議日期時間</label>
+          <input
+            type="datetime-local"
+            id="meetingDate"
+          >
+        </div>
+
+        <div class="form-group">
+          <label>主持人</label>
+          <input
+            type="text"
+            id="host"
+            placeholder="請輸入主持人"
+          >
+        </div>
+
+        <div class="form-group full">
+          <label>會議紀錄</label>
+
+          <textarea
+            id="meetingContent"
+            placeholder="請輸入本次會議討論內容、決議事項、後續安排……"
+          ></textarea>
+        </div>
+
+      </div>
+
+      <div class="form-actions">
+
+        <button
+          class="btn btn-primary"
+          onclick="createMeeting()"
+        >
+          建立並產生連結
+        </button>
+
+        <button
+          class="btn btn-secondary"
+          onclick="clearForm()"
+        >
+          清除
+        </button>
+
+      </div>
+
+      <div
+        class="notice"
+        id="successMessage"
+      >
+        會議紀錄已建立，下一步將產生專屬確認連結。
+      </div>
+
+    </section>
+
+
+    <!-- 所有紀錄 -->
+    <section class="section">
+
+      <div class="section-title">
+        所有紀錄
+      </div>
+
+      <div class="record-list" id="recordList">
+
+        <!-- 範例資料 -->
+        <div class="record">
+
+          <div>
+            <div class="record-title">
+              儀控招募與人員培訓會議
+            </div>
+
+            <div class="record-info">
+              苗栗廠／儀控　・　2026/09/21 14:00
+            </div>
+          </div>
+
+          <div>
+            <span class="status">
+              待與會人員確認
+            </span>
+          </div>
+
+          <div class="record-actions">
+
+            <button
+              class="small-btn"
+              onclick="previewMeeting()"
+            >
+              查看
+            </button>
+
+            <button
+              class="small-btn"
+              onclick="copyLink()"
+            >
+              複製連結
+            </button>
+
+            <button
+              class="small-btn"
+              onclick="exportPDF()"
+            >
+              轉出 PDF
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <script>
+
+    function createMeeting() {
+
+      const title =
+        document.getElementById("meetingTitle").value.trim();
+
+      const department =
+        document.getElementById("department").value.trim();
+
+      const date =
+        document.getElementById("meetingDate").value;
+
+      const content =
+        document.getElementById("meetingContent").value.trim();
+
+      if (!title) {
+        alert("請輸入會議主旨");
+        return;
+      }
+
+      if (!department) {
+        alert("請輸入會議部門");
+        return;
+      }
+
+      if (!date) {
+        alert("請選擇會議日期時間");
+        return;
+      }
+
+      if (!content) {
+        alert("請輸入會議紀錄");
+        return;
+      }
+
+      document.getElementById("successMessage").style.display = "block";
+
+      alert(
+        "第一版畫面測試成功！\n\n" +
+        "下一步會把這裡正式接到 Firebase，" +
+        "讓資料真的儲存並產生專屬網址。"
+      );
+    }
+
+
+    function clearForm() {
+
+      document.getElementById("meetingTitle").value = "";
+      document.getElementById("department").value = "";
+      document.getElementById("meetingDate").value = "";
+      document.getElementById("host").value = "";
+      document.getElementById("meetingContent").value = "";
+
+      document.getElementById("successMessage").style.display = "none";
+    }
+
+
+    function previewMeeting() {
+      alert("下一階段會加入會議內容預覽頁。");
+    }
+
+
+    function copyLink() {
+      alert("下一階段會產生真正的專屬會議連結。");
+    }
+
+
+    function exportPDF() {
+      alert("下一階段會加入正式 PDF 輸出功能。");
+    }
+
+  </script>
+
+</body>
+</html>
